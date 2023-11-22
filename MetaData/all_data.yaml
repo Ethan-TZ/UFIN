@@ -1,0 +1,9 @@
+feature_defaults : [[0], [0], [0], [0], ['x'], ['x'], ['x']]
+load_feature_stastic: ['label', 'user_id', 'item_id', 'brand', 'title', 'description', 'category']
+# feature_stastic: {"label": 2,"user_id": 585166, "item_id": 1995141, "brand": 1045604, "title": 673355, "description": 2076879, "category": 1074}
+feature_stastic: {'user_id': 1002827, 'item_id': 2530874, 'label': 2, 'category': 4494, 'brand': 1112269, 'title': 1031087}
+#, 'description': 2994689}
+item_field: "item_id"
+user_field: "user_id"
+user_attribute: ["user_id"]
+item_attribute: ["item_id", "brand", "title", "description", "category"]

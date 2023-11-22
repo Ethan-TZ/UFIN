@@ -1,0 +1,15 @@
+dataset: ['Movie']
+batch_size: 1024
+split: ['0.8','0.1','0.1']
+interval: 1
+early_stop: 15
+verbose: False
+draw_loss_points: 100
+model: 'DeepGFM'
+L2: 0
+rank: 3
+k_interval: 0
+tune_steps: 20
+shuffle: True
+seed: 2021
+num_works: 0

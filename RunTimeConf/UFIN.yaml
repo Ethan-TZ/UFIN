@@ -1,0 +1,19 @@
+dataset: ['Movies_and_TV','Grocery_and_Gourmet_Food','Electronics','Books','Musical_Instruments','Office_Products','Toys_and_Games']
+batch_size: 1024
+split: ['0.8','0.1','0.1']
+interval: 1
+early_stop: 10
+verbose: False
+draw_loss_points: 100
+L2: 0.0
+
+model: 'UFIN'
+embedding_size: 16
+learning_rate: 0.001
+weight_decay: 0.00001
+depth: 2
+mlp: [0, 400, 400, 400, 1]
+num_layers: 2
+dp_rate: 0.0
+distill_from: 'EulerNet' 
+plm_shape: 512
