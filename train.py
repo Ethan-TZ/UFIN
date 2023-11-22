@@ -6,15 +6,11 @@ from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 from Utils import Logger
 import random as r
-# 1. 加res
-# 2. 减layer
-
 
 class Trainer():
     def __init__(self , filename) -> None:
         config = Config(filename)
         self.config = config
-
         self.ID = filename.split('.')[0]
         self.logger = Logger(config)
         self.interval = config.interval
@@ -27,9 +23,7 @@ class Trainer():
         else:
             self.model = eval(f"{config.model}")(config)
         self.params, self.unparams = [], []
-        # save_info = torch.load('/home/data/tz/DAGFM_pytorch/EulerNet_ckpt/EulerNetAvazu_best')['model']
-        # related_params={k:v for k,v in save_info.items() if 'c_dnn' in k}
-        # self.model.load_state_dict(related_params, strict=False)
+
         for name, _ in self.model.named_parameters():
             if 'embedding' in name:
                 self.unparams.append(_)
@@ -41,13 +35,8 @@ class Trainer():
             else:
                 self.params.append(_)
 
-
-
         self.tune = True
         self.optimizer =  torch.optim.Adam(self.model.parameters(), lr=config.learning_rate , weight_decay=config.weight_decay)
-        #self.optimizer = torch.optim.Adam(self.get_group_parameters(config.learning_rate * 10, config.learning_rate))
-        #self.optimizer = torch.optim.Adam(self.get_group_parameters(config.learning_rate,config.learning_rate))
-        #self.no_decay_optimizer = torch.optim.Adam(unparams, lr=config.learning_rate)
         self.interval_cur = self.switch_interval = 300
         
         self.loss_fn = nn.BCELoss()
@@ -56,7 +45,6 @@ class Trainer():
         self.early_stop_cnt = config.early_stop
         self.config = config
         self.draw_interval = len(self.dataset.train) // config.draw_loss_points
-        #self.model.embedding_layer.get_popularity(self.dataset.train)
         self.has_live = True
         self.k_interval = 200
         self.epoch = 0
@@ -74,16 +62,6 @@ class Trainer():
         ]
         return param_group
 
-    def get_optimizer(self):
-        
-        self.tune = not self.tune
-        if self.tune:
-            return torch.optim.Adam(self.params, lr=self.config.learning_rate , weight_decay=self.config.weight_decay)
-        else:
-            #return torch.optim.Adam(self.params, lr=self.config.learning_rate , weight_decay=self.config.weight_decay)
-            return torch.optim.Adam(self.unparams, lr=self.config.learning_rate, weight_decay=self.config.weight_decay)
-        
-
     @property
     def current_state(self):
         return {
@@ -96,37 +74,17 @@ class Trainer():
     
     def resume(self):
         save_info = torch.load(self.savedpath)
-        # self.optimizer.load_state_dict(save_info['optimizer'])
         related_params= {k:v for k,v in save_info['model'].items() if 'fine_tune_adaptiver' not in k}
         self.model.load_state_dict(related_params, strict = False)
         self.epoch = save_info['epoch'] + 1
         self.best_auc = 0#save_info['best_auc']
-        # self.early_stop_cnt = save_info['early_stop_cnt']
         print("model loaded !")
     
     def run(self):
-        # if self.has_live:
-        #     self.has_live = False
-        #     self.k_interval = 2000
-        #     self.optimizer = self.get_optimizer()#torch.optim.Adam(self.get_group_parameters(self.config.learning_rate*0.1, 0), weight_decay=self.config.weight_decay)
-        #     self.early_stop_cnt = self.config.early_stop
-        #     self.run()
-
-        auc, logloss = self.test_epoch(self.dataset.val)
-        print(auc,logloss)
-        # input()
         self.writer = SummaryWriter(self.config.logdir)
         self.train_process()
         self.evaluation_process()
         self.writer.close()
-
-        # if self.has_live:
-        #     self.has_live = False
-        #     self.k_interval = 100000000000000
-        #     self.epoch = 0
-        #     self.optimizer = self.get_optimizer()#torch.optim.Adam(self.get_group_parameters(self.config.learning_rate*0.1, 0), weight_decay=self.config.weight_decay)
-        #     self.early_stop_cnt = self.config.early_stop
-        #     self.run()
 
     def train_process(self):
         for i in range(self.epoch , 1000):
@@ -138,7 +96,6 @@ class Trainer():
             if i % self.interval == 0:
                 auc , logloss = self.test_epoch(self.dataset.val)
                 self.logger.record(self.step , auc ,logloss , 'val')
-                #print(f"epoch{self.step} , auc: {auc} , logloss: {logloss}")
                 self.writer.add_scalars('VAL/AUC' , {self.ID : auc} , self.step)
                 self.writer.add_scalars('VAL/LOGLOSS' , {self.ID : logloss} , self.step)
                 if auc > self.best_auc:
@@ -152,7 +109,6 @@ class Trainer():
                     self.early_stop_cnt -= 1
                 if self.early_stop_cnt == 0:
                     return
-            #torch.save(self.current_state , self.savedpath)
     
     def evaluation_process(self):
         saved_info = torch.load(self.savedpath + '_best')
@@ -172,27 +128,14 @@ class Trainer():
         self.model.train()
         for fetch_data in tqdm(self.dataset.train) if self.config.verbose else self.dataset.train:
             cnt += 1
-            # if cnt % self.k_interval == 0:
-            #     auc , logloss = self.test_epoch(self.dataset.val)
-            #     self.model.train()
-            #     print( auc ,logloss , 'val')
             optimizer.zero_grad()
-            #self.no_decay_optimizer.zero_grad()
             prediction = self.model(fetch_data)
             loss = self.loss_fn(prediction.squeeze(-1) , fetch_data['label'].squeeze(-1).cuda()) \
                 + self.model.RegularLoss(weight = self.config.L2) \
-               # + 0.5 * self.model.get_aux_loss(fetch_data['label'].squeeze(-1).cuda() , self.loss_fn)
-            #loss =  torch.mean((self.model.logits.squeeze(-1) - 3.5* (fetch_data['label'] - 0.5).squeeze(-1).cuda())**2) * 1024
-            
-            #with torch.autograd.detect_anomaly():
+
             loss.backward()
-            #nn.utils.clip_grad.clip_grad_norm_(self.model.parameters(), 10)
             optimizer.step()
-            #self.no_decay_optimizer.step()
             res += loss.cpu().item()
-            # if cnt % self.draw_interval == 0:
-            #     self.writer.add_scalars('TRAIN/LOSS',{self.ID : res / self.draw_interval},self.step * self.config.draw_loss_points + cnt // self.draw_interval)
-            #     res = 0
 
     def test_epoch(self , datasource):
         with torch.no_grad():

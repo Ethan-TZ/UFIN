@@ -237,37 +237,6 @@ class DMLP(BasicModel):
         self.ouput = torch.sigmoid(self.logits)
         return self.ouput
 
-class EMLP(BasicModel):
-    def __init__(self , config: Config) -> None:
-        super().__init__(config)
-        field_num = len(config.feature_stastic) - 1
-        self.mlplist = [16 * field_num, 16 * field_num, 16 * field_num, 16 * field_num, 16 * field_num]
-        mlps = []
-
-        idx = -1
-        for inshape, outshape in zip(self.mlplist[:-1], self.mlplist[1:]):
-            idx += 1
-            mlps.append(Bridge_BlockV1(inshape, outshape, nn.ReLU() if idx != len(self.mlplist) - 2 else None))
-
-        self.tha_dnn = DNN(config, [0, 512, 512, 1])
-        self.bkb = nn.Sequential(*mlps)
-
-        self.regular = nn.Linear(self.mlplist[-1], 1)
-        #nn.init.normal_(self.regular.weight, mean = 0, std =)
-        # self.reserved = []
-        # for modu in mlps:
-        #     self.reserved.extend()
-
-    def FeatureInteraction(self , feature , sparse_input, *kargs):
-        #lam, tha = torch.sigmoid(feature), kargs[0]
-        r, i = feature, kargs[0]
-        r, i = self.bkb((r, i))
-        r, i = r.view(r.shape[0], -1), i.view(i.shape[0], -1)
-        r, i = self.regular(r), self.regular(i)
-        self.logits =r + i #lam * torch.cos(tha) + lam * torch.sin(tha)
-        self.ouput = torch.sigmoid(self.logits)
-        return self.ouput
-
 class MLP(BasicModel):
     def __init__(self , config: Config) -> None:
         super().__init__(config)
@@ -280,39 +249,5 @@ class MLP(BasicModel):
 
     def FeatureInteraction(self , feature , sparse_input, *kargs):
         self.logits = self.dnn(feature)
-        self.output = torch.sigmoid(self.logits)
-        return self.output
-
-class ComplexMLPs(BasicModel):
-    def __init__(self , config: Config) -> None:
-        super().__init__(config)
-        self.mlplist = config.mlp
-        self.dnn = DNN(config , self.mlplist, dp_rate= 0.2, drop_last= True)
-        self.backbone = ['dnn']
-        field_num = self.field_num = len(config.feature_stastic) - 1
-        self.C = nn.Parameter(torch.ones(1, field_num, 1))
-        self.p = DNN(config, [16, 16], autoMatch= False, drop_last= False)
-
-    def FeatureInteraction(self, feature , sparse_input, *kargs):
-        r, i = self.C * torch.cos(feature), self.C * torch.sin(feature)
-        self.logits = self.dnn(r) + self.dnn(i)
-        self.output = torch.sigmoid(self.logits)
-        return self.output
-
-class InterMLP(BasicModel):
-    def __init__(self , config: Config) -> None:
-        super().__init__(config)
-        self.mlplist = config.mlp
-        self.dnn = DNN(config , self.mlplist, dp_rate= 0.3, drop_last= True)
-        self.backbone = ['dnn']
-        field_num = self.field_num = len(config.feature_stastic) - 1
-        self.C = nn.Parameter(torch.ones(1, field_num, 1))
-        self.p = DNN(config, [16, 8, 1], autoMatch= False, drop_last= True, dp_rate=0.)
-        self.dp = nn.Dropout(p = 0.3)
-
-    def FeatureInteraction(self , feature , sparse_input, *kargs):
-        r, i = self.C * torch.sin(self.p(feature) * feature + torch.pi / 2), self.C * torch.sin(self.p(feature) * feature)
-        r, i = self.dp(r), self.dp(i)
-        self.logits = self.dnn(r) + self.dnn(i)
         self.output = torch.sigmoid(self.logits)
         return self.output
