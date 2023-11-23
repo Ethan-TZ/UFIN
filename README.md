@@ -14,7 +14,7 @@ Furthermore,  we propose a multi-domain knowledge distillation framework to enha
 Based on the above methods, UFIN can effectively bridge the semantic gap to learn common knowledge across various domains, surpassing the constraints of ID-based models.
 Extensive experiments conducted  on eight datasets show the effectiveness of UFIN, in both multi-domain and cross-platform settings.
 
-![model](./asset/model.jpg)
+![model](./asserts/UFIN.png)
 
 # Dataset Preparation
 To evaluate the performance of our model, we conduct experiments on the [Amazon](https://nijianmo.github.io/amazon/index.html) and [MovieLens-1M](https://grouplens.org/datasets/movielens) datasets.
@@ -31,7 +31,7 @@ Finally, get the files for training, validation, and testing:
 python DataSource/split.py
 ```
 
-## Training
+## Quick Start
 
 ### 1. Guided Networks Preparation
 ```
