@@ -16,6 +16,38 @@ Extensive experiments conducted  on eight datasets show the effectiveness of UFI
 
 ![model](./asset/model.jpg)
 
+# Dataset Preparation
+To evaluate the performance of our model, we conduct experiments on the [Amazon](https://nijianmo.github.io/amazon/index.html) and [MovieLens-1M](https://grouplens.org/datasets/movielens) datasets.
+The scripts for dataset processing can be found under the **/DataSource** folder.
+You first need to download the raw dataset files and put them into the **/DataSource** folder.
+
+Then pre-process the data:
+```
+python DataSource/[dataset]_parse.py
+```
+
+Finally, get the files for training, validation, and testing:
+```
+python DataSource/split.py
+```
+
+## Training
+
+### 1. Guided Networks Preparation
+```
+bash pretrain_teacher.sh
+```
+
+### 2. Training
+```
+python train.py --config_files=UFIN.yaml
+```
+
+### 3. Evaluation
+```
+bash test_all.sh
+```
+
 ## Requirements
 
 ```

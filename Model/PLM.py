@@ -22,7 +22,7 @@ class PLM(nn.Module):
         self.forward = self.FeatureInteraction
 
     def load_feature_map(self):
-        path = './MetaData/feature_index'
+        path = './DataSource/feature_index'
         self.feature_map = {}
         with open(path) as f:
             idx  = 0

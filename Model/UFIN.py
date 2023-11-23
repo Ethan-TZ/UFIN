@@ -15,7 +15,7 @@ class UFIN(BasicModel):
         self.plm_shape = config.plmshape
         self.num_experts = config.num_experts
         hidden_size = (len(config.feature_stastic) -1 ) * config.embedding_size
-        self.moe_adapter = MoEAdaptorLayer(self.num_experts, [self.plm_shape, self.plm_shape])
+        self.llm_moe = MoEAdaptorLayer(self.num_experts, [self.plm_shape, self.plm_shape])
         self.moe = EulerMoE(self.num_experts, [self.plm_shape])
         self.fine_tune_adaptiver = nn.Linear(hidden_size, 1, bias = False)
         self.phase = phase
@@ -39,7 +39,7 @@ class UFIN(BasicModel):
             plm_out = sparse_input['encoding'].cuda()
 
         plm_out = self.norm(plm_out)
-        plm_out = (self.moe_adapter(plm_out))
+        plm_out = self.llm_moe(plm_out)
 
         faker = plm_out + self.U(kargs[0].view(kargs[0].shape[0], -1))
         faker = self.moe(faker)
