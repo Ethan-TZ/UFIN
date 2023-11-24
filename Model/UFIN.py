@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from Model.PLM import PLM
 from torch.nn import functional as F
-from Model.Layers.MMoE import MoEAdaptorLayer, CRSMoE, EulerMoE, EulerInteraction, CINMoE
+from Model.Layers.MMoE import MoEAdaptorLayer, EulerMoE, EulerInteraction
 
 class UFIN(BasicModel):
     def __init__(self , config: Config, phase = 'training') -> None:
