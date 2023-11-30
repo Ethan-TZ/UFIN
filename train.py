@@ -6,6 +6,7 @@ from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 from Utils import Logger
 import random as r
+from Model import *
 
 class Trainer():
     def __init__(self , filename) -> None:
