@@ -211,7 +211,8 @@ class Dataset():
         for dataset in config.dataset:
             d_train, d_val, d_test, d_feature_stastic = self.load_single_dataset(dataset)
             config.feature_stastic = d_feature_stastic
-            Hook.language_hook(config, [d_train, d_val, d_test], dataset)
+            if 'UFIN' in str(config.model):
+                Hook.language_hook(config, [d_train, d_val, d_test], dataset)
             if hasattr(config, 'distill_from'):
                 Hook.teacher_hook(config, [d_train, d_val, d_test], dataset, config.distill_from)
             # d_train.remove()
