@@ -206,12 +206,12 @@ class Dataset():
     def __init__(self , config : Config) -> None:
         train, val, test = Interaction(phase='train'), Interaction(phase='val'), Interaction(phase='test')
         feature_stastic = {}
-        if enable:
-            Hook.language_hook(config, [], [])
+        # if enable:
+        #     Hook.language_hook(config, [], [])
         for dataset in config.dataset:
             d_train, d_val, d_test, d_feature_stastic = self.load_single_dataset(dataset)
             config.feature_stastic = d_feature_stastic
-            # Hook.language_hook(config, [d_train, d_val, d_test], dataset)
+            Hook.language_hook(config, [d_train, d_val, d_test], dataset)
             if hasattr(config, 'distill_from'):
                 Hook.teacher_hook(config, [d_train, d_val, d_test], dataset, config.distill_from)
             # d_train.remove()
