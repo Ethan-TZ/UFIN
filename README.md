@@ -35,6 +35,7 @@ Then pre-process the data:
 ```
 python DataSource/[dataset]_parse.py
 ```
+[Note: We also provide the processed dataset at this link: https://drive.google.com/file/d/1kMsnxyEnx2ZrAqjk9L3Ejypkt7HqYGgB/view?usp=sharing, where you can directly download these files.]
 
 Finally, get the files for training, validation, and testing:
 ```
