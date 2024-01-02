@@ -22,7 +22,7 @@ xx = {
     'Toys_and_Games': 6,
     'ML': 6
 }
-enable = True
+enable = False
 class Interaction():
     def __init__(self, data = None, phase = None) -> None:
         self._d = {} if data is None else data
@@ -214,9 +214,9 @@ class Dataset():
             # Hook.language_hook(config, [d_train, d_val, d_test], dataset)
             if hasattr(config, 'distill_from'):
                 Hook.teacher_hook(config, [d_train, d_val, d_test], dataset, config.distill_from)
-            d_train.remove()
-            d_val.remove()
-            d_test.remove()
+            # d_train.remove()
+            # d_val.remove()
+            # d_test.remove() 
 
             Hook.scene_hook([d_train, d_val, d_test], dataset)
             train = train + d_train

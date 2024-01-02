@@ -1,5 +1,6 @@
 from Model.MLP import *
-from Model.PLM import PLM
+from Model.DCNV2 import DCNV2
+from Model.EulerNet import EulerNet
 from Model.UFIN import UFIN
 
-__all__ = ["PLM", "UFIN"]
+__all__ = ["DCNV2", "EulerNet", "UFIN"]
