@@ -17,3 +17,4 @@ num_layers: 2
 dp_rate: 0.0
 distill_from: 'EulerNet' 
 plm_shape: 512
+is_add_fa: True

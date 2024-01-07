@@ -27,7 +27,7 @@ class UFIN(BasicModel):
         self.is_add_fa = config.is_add_fa
 
     def forward(self , sparse_input, dense_input = None):
-        predict = self.FeatureInteraction(None , sparse_input, self.i_embedding_layer(sparse_input, "no_id"), None)
+        predict = self.FeatureInteraction(dense_input , sparse_input, self.i_embedding_layer(sparse_input, "no_id"), None)
         return predict
 
     def FeatureInteraction(self , feature , sparse_input, *kargs):
